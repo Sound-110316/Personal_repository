@@ -1,0 +1,78 @@
+    
+    *ここから追加CSS*/
+    
+    h1{
+      padding: 0.4em 0.5em; /*文字の上下 左右の余白*/
+      color: #494949; /*文字色*/
+      background: #f4f4f4;/*背景色*/
+      border-left: solid 5px #ea5219;/*左線*/
+      border-bottom: solid 3px #d7d7d7;/*下線*/
+    }
+  
+    h2 {
+      position: relative;
+      padding: 0.5em;
+      background: #ea5219;
+      color: white;
+    }
+  
+    h2::before {
+      position: absolute;
+      content: '';
+      top: 100%;
+      left: 0;
+      border: none;
+      border-bottom: solid 15px transparent;
+      border-right: solid 20px rgb(149, 158, 155);
+    }
+    h3 {
+    background: linear-gradient(transparent 70%, #ea5119c2 70%);
+    }
+    h4 {
+    border-bottom: solid 3px #e29b82d3;
+    position: relative;
+    }
+    
+    h4:after {
+    position: absolute;
+    content: " ";
+    display: block;
+    border-bottom: solid 3px #ea5219;
+    bottom: -3px;
+    width: 20%;
+    }
+    h5 {
+      color: #494949;
+      padding: .5em .75em;
+      border-bottom-style: dotted;
+      border-bottom-color: #ea5219;
+      border-bottom-width:thin;
+    }
+    /* テーブル */
+  .text table {
+    width: auto;
+    border: 1px solid #555555;
+    border-collapse: collapse;
+    border-spacing: 0;
+    }
+   table thead th {
+     background: #ea5219;
+     font-weight: bold;
+     vertical-align: top;
+     color: #fff;
+   }
+   table th,
+   table td {
+     padding: 6px 13px;
+     border: 1.5px solid white;
+   }
+   table tr {
+    background-color: #ea51193b;
+    border-top: 1px solid #ccc;
+   }
+   table tr:nth-child(2n) {
+     background-color:  #f07f5628;
+   }
+  
+
+  

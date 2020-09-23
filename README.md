@@ -1,2 +1,2 @@
-# test-repository
-pythonのスクリプトなどをあげていきます
+# Personalrepository
+pythonのスクリプト,研究の進捗などをあげていきます

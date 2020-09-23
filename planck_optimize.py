@@ -23,22 +23,24 @@ import matplotlib.pyplot as plt
 ## to excel
 import pandas as pd
 import openpyxl as excel
+## to png
+import aplpy as apl
 
 def planck(x,T,A):
   x = sc.c/(10**(x-6))
   return A+5*np.log10(x)+np.log10(2)+np.log10(sc.h)-2*np.log10(sc.c)-np.log10(np.exp(sc.h*x/(sc.k*T)))+20
 
-def ConvUnit(naxis):
-  return 1/(((10/naxis)**2)/3600*((2*np.pi)/360)**2)*1e-6
+def ConvUnit(cdelt):
+  return 1/(((cdelt*60)**2)/3600*((2*np.pi)/360)**2)*1e-6
 
-
+d = 0
 warnings.simplefilter('ignore')
 
 temp_initial = 6
 bairitu_initial = -30
 temp_mintoMax = [5.8,100]
 bairitu_mintoMax = [-50,10]
-
+lenvalplot = 0
 objli = input("ファイル名(複数ある場合は\",\"で区切る) : ").split(",")
 path = os.path.dirname(os.path.abspath(__file__))+"/"
 for obj in objli:
@@ -56,13 +58,11 @@ for obj in objli:
       print("最初からやり直してください")
       sys.exit()
     
-    
     try:
       shutil.rmtree(path+"Fit_"+obj)
     except :
         pass
     os.mkdir(path+"Fit_"+obj)
-    
     
     li, li_v, obs_a, obs, wavelist = [],[],[],[],[]
     a = 0
@@ -84,14 +84,15 @@ for obj in objli:
                 wavelen = int(input("please enter wavelen ="))
         naxis1 = fits[0].header.get('NAXIS1')
         naxis2 = fits[0].header.get('NAXIS2')
+        cdelt1 = fits[0].header.get('CDELT1')
         wavelist.append(wavelen)
-    
+
         for i in range(0, naxis2):
             for j in range(0, naxis1):
                 v = data[i][j]
                 if v > 0:
                   if   wavelen == 70 or wavelen == 100 or wavelen == 160:
-                      w = ConvUnit(naxis1)
+                      w = ConvUnit(cdelt1)
                   elif wavelen == 250:
                       w = 90
                   elif wavelen == 350:
@@ -134,7 +135,6 @@ for obj in objli:
         print("\r"+"..."+str('{:.2f}'.format(((n+1)/(len(y1)))*100))+"%",end="")
         logWavelist = [np.log10(m) for m in wavelist]
     
-    
         a = 0
         nanDel = [logWavelist,y1[n]]
         b = ~np.isnan(nanDel).any(axis=0)
@@ -150,7 +150,10 @@ for obj in objli:
             else:
               e += 1
               f += 1
-        if f != len(b):
+        print("飽和でない:",len(valPlot))
+
+        if len(valPlot) > 2:# f != len(b): # サチっていない個数
+            lenvalplot += 1
             param_bounds = ((temp_mintoMax[0], bairitu_mintoMax[0]), (temp_mintoMax[1], bairitu_mintoMax[1]))
             syokichi = [temp_initial,bairitu_initial]
             param, cov = curve_fit(planck, wavePlot, valPlot, p0=syokichi,maxfev=100000,bounds=param_bounds)   # p0
@@ -174,7 +177,7 @@ for obj in objli:
             temp.append(param[0])
             bairitu.append(param[1])
         else:
-            temp.append(0.000)
+            temp.append(np.nan)
             bairitu.append(np.nan)
     
     reTem = reversed(np.reshape(temp,[naxis2,naxis1]))
@@ -186,34 +189,25 @@ for obj in objli:
     hdu = hdulist[0]
     data = hdu.data
     header1 = hdu.header
-    hdu = astropy.io.fits.PrimaryHDU(data=df)
+    hdu = astropy.io.fits.PrimaryHDU(data=df[::-1])
     
     hdu.header = header1
-    # 入れたいヘッダ一覧
-    
+    # 入れたいヘッダ
     hdu.header['BITPIX'] = -64
     hdu.header['NAXIS'] = 2
     hdu.header['NAXIS1'] = len(df.columns)
     hdu.header['NAXIS2'] = len(df)
-    hdu.header['BUNIT'] = 'K       '
-    """
-    hdu.header['BPA'] = 0.000000
-    hdu.header['BMAJ'] = beamsize/3600
-    hdu.header['BMIN'] = beamsize/3600
-    hdu.header['EPOCH'] = 2000
-    hdu.header['CTYPE1'] = 'RA---GLS'
-    hdu.header['CRVAL1'] = 348.43894167
-    hdu.header['CDELT1'] = 0.01  # -0.27777784047E-02
-    hdu.header['CRPIX1'] = x/2
-    hdu.header['CROTA1'] = 0.0
-    hdu.header['CUNIT1'] = 'deg     '
-    hdu.header['CTYPE2'] = 'DEC--GLS'
-    hdu.header['CRVAL2'] = 61.447311111
-    hdu.header['CDELT2'] = 0.01  # 0.27777784047E-02
-    hdu.header['CRPIX2'] = y/2
-    hdu.header['CROTA2'] = 0.0
-    hdu.header['CUNIT2'] = 'deg     '
-    """
+    hdu.header['BUNIT'] = 'K'
     # 作ったfitsの保存
     hdu.writeto(path+'Fit_'+obj+'/planck_Temp_'+obj+ ".fits", overwrite=True)
+
+    fig = plt.figure(figsize = (5,5))
+    f1 = apl.FITSFigure(path+'Fit_'+obj+'/planck_Temp_'+obj+ ".fits", figure=fig, subplot=(1,1,1))
+    f1.show_colorscale(cmap="jet")
+    f1.add_colorbar()
+    f1.axis_labels.hide()
+    f1.tick_labels.show()
+    f1.set_title(hdu.header["OBJECT"]) 
+    plt.savefig(path+'Fit_'+obj+'/planck_Temp_'+obj+ '.png')
+    print(lenvalplot)
     print("完了！！")

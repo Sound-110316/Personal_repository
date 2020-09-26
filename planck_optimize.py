@@ -41,7 +41,7 @@ bairitu_initial = -30
 temp_mintoMax = [5.8,100]
 bairitu_mintoMax = [-50,10]
 lenvalplot = 0
-objli = input("ファイル名(複数ある場合は\",\"で区切る) : ").split(",")
+objli = input("ディレクトリ名(複数ある場合は\",\"で区切る) : ").split(",")
 path = os.path.dirname(os.path.abspath(__file__))+"/"
 for obj in objli:
     inname = []

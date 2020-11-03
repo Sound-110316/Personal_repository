@@ -29,8 +29,8 @@ for re in range(len(regions)):
 vmin, vmax = [8, 14, 17, 11, 11, 18, 15, 20, 14,10]*2,[26, 33, 28, 26, 24, 50, 37, 38, 29,20]*2
 
 
-fig = plt.figure(figsize=(10,50)) # figが台紙のようなものでそこに画像を貼るイメージ # 図の大きさはここで決定する。()内に"figsize = (横,縦)"を入れると図の大きさを決めれる
-plt.subplots_adjust(hspace=3,wspace=3)
+fig = plt.figure(figsize=(10,40)) # figが台紙のようなものでそこに画像を貼るイメージ # 図の大きさはここで決定する。()内に"figsize = (横,縦)"を入れると図の大きさを決めれる
+fig.subplots_adjust(hspace=0.3,wspace=0.4) # 図同士のスペースを調節
 li = []
 
 
@@ -73,8 +73,8 @@ for n in range(len(filenames)):
         # f1.axis_labels.set_ytext('Declination (J2000)') # Y軸ラベルの名称の設定
 
         ########## 目盛の設置 ##########
-        # f1.tick_labels.show() # 目盛あり
-        f1.tick_labels.hide() # 目盛なし
+        f1.tick_labels.show() # 目盛あり
+        # f1.tick_labels.hide() # 目盛なし
 
         ########## Beamサイズの設置 ##########
         # f1.add_beam() # beamサイズの有無
@@ -110,10 +110,7 @@ for n in range(len(filenames)):
             f1.set_title(hdu.header["OBJECT"],fontsize=30)
         ########## fitsを閉じる ###########
         astropy.io.fits.open(filename).close()
-
-fig.tight_layout()# 余白を少なく
+# fig.tight_layout()# 余白を少なく
 
 fig.savefig("Temperature_Figure_tate.png",dpi=300)
-
-
 print("FINISH")
